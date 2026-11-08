@@ -1,0 +1,25 @@
+# dbt
+target/
+dbt_packages/
+logs/
+.user.yml
+profiles.yml
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets and local files
+.env
+*.pem
+*.p8
+
+# Raw source files are loaded into the warehouse, never committed
+raw_data/
+*.zip
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
