@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: adventure_works
+    database: raw
+    schema: adventure_works
+    tables:
+      - name: sales_salesorderheader
