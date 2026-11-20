@@ -9,3 +9,4 @@ sources:
       - name: sales_salesorderdetail
       - name: sales_customer
       - name: production_product
+      - name: sales_salesterritory
