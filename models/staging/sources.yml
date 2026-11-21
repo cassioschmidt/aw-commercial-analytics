@@ -10,3 +10,4 @@ sources:
       - name: sales_customer
       - name: production_product
       - name: sales_salesterritory
+      - name: sales_salesperson
