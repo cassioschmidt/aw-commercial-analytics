@@ -9,3 +9,20 @@ models:
         data_tests:
           - unique
           - not_null
+
+  - name: stg_adventure_works__sales_salesorderdetail
+    description: Sales order lines, one row per product in each order.
+    columns:
+      - name: sales_order_detail_id
+        description: Primary key of the order line.
+        data_tests:
+          - unique
+          - not_null
+      - name: sales_order_id
+        description: Order that the line belongs to.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_salesorderheader')
+                field: sales_order_id
