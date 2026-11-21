@@ -9,6 +9,28 @@ models:
         data_tests:
           - unique
           - not_null
+      - name: customer_id
+        description: Customer who placed the order.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_customer')
+                field: customer_id
+      - name: territory_id
+        description: Sales territory of the order.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_salesterritory')
+                field: territory_id
+      - name: sales_person_id
+        description: Sales person of the order. Empty for online orders.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_salesperson')
+                field: sales_person_id
 
   - name: stg_adventure_works__sales_salesorderdetail
     description: Sales order lines, one row per product in each order.
@@ -26,3 +48,47 @@ models:
               arguments:
                 to: ref('stg_adventure_works__sales_salesorderheader')
                 field: sales_order_id
+      - name: product_id
+        description: Product sold in the line.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__production_product')
+                field: product_id
+
+  - name: stg_adventure_works__sales_customer
+    description: Customers, either a person or a store.
+    columns:
+      - name: customer_id
+        description: Primary key of the customer.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_adventure_works__production_product
+    description: Products sold or used in manufacturing.
+    columns:
+      - name: product_id
+        description: Primary key of the product.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_adventure_works__sales_salesterritory
+    description: Sales territories.
+    columns:
+      - name: territory_id
+        description: Primary key of the sales territory.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_adventure_works__sales_salesperson
+    description: Sales people, with quota, bonus and commission.
+    columns:
+      - name: sales_person_id
+        description: Primary key of the sales person.
+        data_tests:
+          - unique
+          - not_null
