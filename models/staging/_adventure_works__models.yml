@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: stg_adventure_works__sales_salesorderheader
+    description: Sales orders, one row per order.
+    columns:
+      - name: sales_order_id
+        description: Primary key of the sales order.
+        data_tests:
+          - unique
+          - not_null
