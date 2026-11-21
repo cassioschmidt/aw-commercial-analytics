@@ -16,3 +16,5 @@ sources:
       - name: person_person
       - name: sales_store
       - name: person_address
+      - name: person_stateprovince
+      
