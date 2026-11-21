@@ -14,3 +14,4 @@ sources:
       - name: production_productsubcategory
       - name: production_productcategory
       - name: person_person
+      - name: sales_store      
