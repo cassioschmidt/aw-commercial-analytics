@@ -1,0 +1,47 @@
+version: 2
+
+sources:
+  - name: adventure_works
+    description: >
+      AdventureWorks tables loaded as CSV files from Google Drive by Fivetran
+      (Magic Folder, one table per file). Kept exactly as loaded.
+    database: raw
+    schema: adventure_works
+    config:
+      loaded_at_field: _fivetran_synced
+      freshness:
+        warn_after: {count: 30, period: day}
+        error_after: {count: 90, period: day}
+    tables:
+    - name: sales_salesorderheader
+      description: Sales orders, one row per order.
+    - name: sales_salesorderdetail
+      description: Order lines, one row per product in each sales order.
+    - name: sales_customer
+      description: Customers, either a person or a store.
+    - name: production_product
+      description: Products sold or used in manufacturing.
+    - name: sales_salesterritory
+      description: Sales territories.
+    - name: sales_salesperson
+      description: Sales people, with quota, bonus and commission.
+    - name: production_productsubcategory
+      description: Product subcategories, each inside a category.
+    - name: production_productcategory
+      description: Top level product categories.
+    - name: person_person
+      description: People, such as customers, employees and contacts.
+    - name: sales_store
+      description: Stores that buy from the company.
+    - name: person_address
+      description: Street addresses of customers, employees and vendors.
+    - name: person_stateprovince
+      description: States and provinces, with the sales territory of each.
+    - name: person_countryregion
+      description: Countries and regions, by ISO code.
+    - name: sales_specialoffer
+      description: Discounts and promotions.
+    - name: sales_salesreason
+      description: Reasons why customers buy.
+    - name: sales_salesorderheadersalesreason
+      description: Links sales orders to the reasons for the purchase.
