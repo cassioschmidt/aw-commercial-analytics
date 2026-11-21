@@ -11,3 +11,4 @@ sources:
       - name: production_product
       - name: sales_salesterritory
       - name: sales_salesperson
+      - name: production_productsubcategory
