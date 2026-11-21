@@ -31,6 +31,20 @@ models:
               arguments:
                 to: ref('stg_adventure_works__sales_salesperson')
                 field: sales_person_id
+      - name: bill_to_address_id
+        description: Billing address of the order.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__person_address')
+                field: address_id
+      - name: ship_to_address_id
+        description: Shipping address of the order.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__person_address')
+                field: address_id
 
   - name: stg_adventure_works__sales_salesorderdetail
     description: Sales order lines, one row per product in each order.
@@ -56,6 +70,14 @@ models:
               arguments:
                 to: ref('stg_adventure_works__production_product')
                 field: product_id
+      - name: special_offer_id
+        description: Special offer applied to the line.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_specialoffer')
+                field: special_offer_id
 
   - name: stg_adventure_works__sales_customer
     description: Customers, either a person or a store.
@@ -65,6 +87,20 @@ models:
         data_tests:
           - unique
           - not_null
+      - name: person_id
+        description: Person behind the customer. Empty for store customers.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__person_person')
+                field: person_id
+      - name: store_id
+        description: Store behind the customer. Empty for individual customers.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_store')
+                field: store_id
 
   - name: stg_adventure_works__production_product
     description: Products sold or used in manufacturing.
@@ -92,3 +128,106 @@ models:
         data_tests:
           - unique
           - not_null
+
+  - name: stg_adventure_works__person_person
+    description: People, such as customers, employees and contacts.
+    columns:
+      - name: person_id
+        description: Primary key of the person.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_adventure_works__sales_store
+    description: Stores that buy from the company.
+    columns:
+      - name: store_id
+        description: Primary key of the store.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_adventure_works__person_address
+    description: Street addresses.
+    columns:
+      - name: address_id
+        description: Primary key of the address.
+        data_tests:
+          - unique
+          - not_null
+      - name: state_province_id
+        description: State or province of the address.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__person_stateprovince')
+                field: state_province_id
+
+  - name: stg_adventure_works__person_stateprovince
+    description: States and provinces.
+    columns:
+      - name: state_province_id
+        description: Primary key of the state or province.
+        data_tests:
+          - unique
+          - not_null
+      - name: country_region_code
+        description: Country or region of the state or province.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__person_countryregion')
+                field: country_region_code
+
+  - name: stg_adventure_works__person_countryregion
+    description: Countries and regions, by ISO code.
+    columns:
+      - name: country_region_code
+        description: Primary key of the country or region.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_adventure_works__sales_specialoffer
+    description: Discounts and promotions.
+    columns:
+      - name: special_offer_id
+        description: Primary key of the special offer.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_adventure_works__sales_salesreason
+    description: Reasons why customers buy.
+    columns:
+      - name: sales_reason_id
+        description: Primary key of the sales reason.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_adventure_works__sales_salesorderheadersalesreason
+    description: Links sales orders to the reasons for the purchase.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - sales_order_id
+              - sales_reason_id
+    columns:
+      - name: sales_order_id
+        description: Order of the link.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_salesorderheader')
+                field: sales_order_id
+      - name: sales_reason_id
+        description: Reason of the link.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_salesreason')
+                field: sales_reason_id
