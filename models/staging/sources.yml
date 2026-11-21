@@ -20,3 +20,4 @@ sources:
       - name: person_countryregion
       - name: sales_specialoffer
       - name: sales_salesreason
+      - name: sales_salesorderheadersalesreason
