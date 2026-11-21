@@ -1,5 +1,5 @@
 with
-    source as (select * from {{ source('adventure_works', 'sales_customer') }}),
+    source as (select * from {{ source("adventure_works", "sales_customer") }}),
     renamed as (
         select
             customerid as customer_id,
