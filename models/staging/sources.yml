@@ -51,3 +51,5 @@ sources:
       description: Sales quota of each sales person over time.
     - name: sales_salesterritoryhistory
       description: Sales territory assignments of each sales person over time.
+    - name: sales_creditcard
+      description: Credit cards used for sales. Contains sensitive payment data.
