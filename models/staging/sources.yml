@@ -49,3 +49,5 @@ sources:
       description: Standard cost of each product over time.
     - name: sales_salespersonquotahistory
       description: Sales quota of each sales person over time.
+    - name: sales_salesterritoryhistory
+      description: Sales territory assignments of each sales person over time.
