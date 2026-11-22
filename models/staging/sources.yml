@@ -55,3 +55,5 @@ sources:
       description: Credit cards used for sales. Contains sensitive payment data.
     - name: sales_currency
       description: Currencies, by ISO code.
+    - name: sales_currencyrate
+      description: Daily exchange rates between currencies.
