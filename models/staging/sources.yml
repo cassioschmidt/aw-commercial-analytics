@@ -47,3 +47,5 @@ sources:
       description: Links sales orders to the reasons for the purchase.
     - name: production_productcosthistory
       description: Standard cost of each product over time.
+    - name: sales_salespersonquotahistory
+      description: Sales quota of each sales person over time.
