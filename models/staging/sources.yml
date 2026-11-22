@@ -57,3 +57,5 @@ sources:
       description: Currencies, by ISO code.
     - name: sales_currencyrate
       description: Daily exchange rates between currencies.
+    - name: sales_countryregioncurrency
+      description: Currency used by each country or region.
