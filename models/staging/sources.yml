@@ -53,3 +53,5 @@ sources:
       description: Sales territory assignments of each sales person over time.
     - name: sales_creditcard
       description: Credit cards used for sales. Contains sensitive payment data.
+    - name: sales_currency
+      description: Currencies, by ISO code.
