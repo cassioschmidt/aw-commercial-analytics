@@ -61,3 +61,5 @@ sources:
       description: Currency used by each country or region.
     - name: production_scrapreason
       description: Reasons why manufactured items are scrapped.
+    - name: production_workorder
+      description: Manufacturing work orders.
