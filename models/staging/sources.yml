@@ -63,3 +63,5 @@ sources:
       description: Reasons why manufactured items are scrapped.
     - name: production_workorder
       description: Manufacturing work orders.
+    - name: sales_specialofferproduct
+      description: Links special offers to the products they apply to.
