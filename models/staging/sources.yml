@@ -279,6 +279,20 @@ sources:
               - not_null
       - name: production_workorder
         description: Manufacturing work orders.
+        columns:
+          - name: workorderid
+            data_tests:
+              - unique
+              - not_null
+          - name: productid
+            data_tests:
+              - not_null
+          - name: orderqty
+            data_tests:
+              - not_null
+          - name: startdate
+            data_tests:
+              - not_null
       - name: sales_specialofferproduct
         description: Links special offers to the products they apply to.
         data_tests:
