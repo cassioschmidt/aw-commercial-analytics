@@ -338,6 +338,11 @@ sources:
           - name: standardcost
             data_tests:
               - not_null
+          - name: enddate
+            data_tests:
+              - date_not_before:
+                  arguments:
+                    compare_column: startdate
       - name: production_scrapreason
         description: 'Reasons why manufactured items are scrapped. Expected arrival: yearly (reference data that rarely changes).'
         columns:
