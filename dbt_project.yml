@@ -28,3 +28,6 @@ models:
   aw_commercial_analytics:
     staging:
       +materialized: view
+
+data_tests:
+  +store_failures: true
