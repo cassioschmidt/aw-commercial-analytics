@@ -55,6 +55,16 @@ sources:
             data_tests:
               - not_null
               - non_negative
+          - name: shipdate
+            data_tests:
+              - date_not_before:
+                  arguments:
+                    compare_column: orderdate
+          - name: duedate
+            data_tests:
+              - date_not_before:
+                  arguments:
+                    compare_column: orderdate
         config:
           freshness:
             warn_after: {count: 35, period: day}
