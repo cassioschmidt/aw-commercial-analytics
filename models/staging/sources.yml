@@ -88,12 +88,29 @@ sources:
               - not_null
       - name: production_product
         description: Products sold or used in manufacturing.
-      - name: sales_salesterritory
-        description: Sales territories.
         columns:
-          - name: territoryid
+          - name: productid
             data_tests:
               - unique
+              - not_null
+          - name: productnumber
+            data_tests:
+              - unique
+              - not_null
+          - name: name
+            data_tests:
+              - not_null
+          - name: makeflag
+            data_tests:
+              - not_null
+          - name: finishedgoodsflag
+            data_tests:
+              - not_null
+          - name: standardcost
+            data_tests:
+              - not_null
+          - name: listprice
+            data_tests:
               - not_null
       - name: sales_salesperson
         description: Sales people, with quota, bonus and commission.
