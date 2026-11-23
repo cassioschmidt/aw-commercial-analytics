@@ -13,55 +13,223 @@ sources:
         warn_after: {count: 30, period: day}
         error_after: {count: 90, period: day}
     tables:
-    - name: sales_salesorderheader
-      description: Sales orders, one row per order.
-    - name: sales_salesorderdetail
-      description: Order lines, one row per product in each sales order.
-    - name: sales_customer
-      description: Customers, either a person or a store.
-    - name: production_product
-      description: Products sold or used in manufacturing.
-    - name: sales_salesterritory
-      description: Sales territories.
-    - name: sales_salesperson
-      description: Sales people, with quota, bonus and commission.
-    - name: production_productsubcategory
-      description: Product subcategories, each inside a category.
-    - name: production_productcategory
-      description: Top level product categories.
-    - name: person_person
-      description: People, such as customers, employees and contacts.
-    - name: sales_store
-      description: Stores that buy from the company.
-    - name: person_address
-      description: Street addresses of customers, employees and vendors.
-    - name: person_stateprovince
-      description: States and provinces, with the sales territory of each.
-    - name: person_countryregion
-      description: Countries and regions, by ISO code.
-    - name: sales_specialoffer
-      description: Discounts and promotions.
-    - name: sales_salesreason
-      description: Reasons why customers buy.
-    - name: sales_salesorderheadersalesreason
-      description: Links sales orders to the reasons for the purchase.
-    - name: production_productcosthistory
-      description: Standard cost of each product over time.
-    - name: sales_salespersonquotahistory
-      description: Sales quota of each sales person over time.
-    - name: sales_salesterritoryhistory
-      description: Sales territory assignments of each sales person over time.
-    - name: sales_creditcard
-      description: Credit cards used for sales. Contains sensitive payment data.
-    - name: sales_currency
-      description: Currencies, by ISO code.
-    - name: sales_currencyrate
-      description: Daily exchange rates between currencies.
-    - name: sales_countryregioncurrency
-      description: Currency used by each country or region.
-    - name: production_scrapreason
-      description: Reasons why manufactured items are scrapped.
-    - name: production_workorder
-      description: Manufacturing work orders.
-    - name: sales_specialofferproduct
-      description: Links special offers to the products they apply to.
+      - name: sales_salesorderheader
+        description: Sales orders, one row per order.
+        columns:
+          - name: salesorderid
+            data_tests:
+              - unique
+              - not_null
+          - name: orderdate
+            data_tests:
+              - not_null
+          - name: status
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values:
+                      - 1
+                      - 2
+                      - 3
+                      - 4
+                      - 5
+                      - 6
+                    quote: false
+          - name: onlineorderflag
+            data_tests:
+              - not_null
+          - name: customerid
+            data_tests:
+              - not_null
+          - name: subtotal
+            data_tests:
+              - not_null
+          - name: taxamt
+            data_tests:
+              - not_null
+          - name: freight
+            data_tests:
+              - not_null
+          - name: totaldue
+            data_tests:
+              - not_null
+      - name: sales_salesorderdetail
+        description: Order lines, one row per product in each sales order.
+        columns:
+          - name: salesorderdetailid
+            data_tests:
+              - unique
+              - not_null
+          - name: salesorderid
+            data_tests:
+              - not_null
+          - name: orderqty
+            data_tests:
+              - not_null
+          - name: productid
+            data_tests:
+              - not_null
+          - name: specialofferid
+            data_tests:
+              - not_null
+          - name: unitprice
+            data_tests:
+              - not_null
+          - name: unitpricediscount
+            data_tests:
+              - not_null
+      - name: sales_customer
+        description: Customers, either a person or a store.
+        columns:
+          - name: customerid
+            data_tests:
+              - unique
+              - not_null
+      - name: production_product
+        description: Products sold or used in manufacturing.
+      - name: sales_salesterritory
+        description: Sales territories.
+        columns:
+          - name: territoryid
+            data_tests:
+              - unique
+              - not_null
+      - name: sales_salesperson
+        description: Sales people, with quota, bonus and commission.
+        columns:
+          - name: businessentityid
+            data_tests:
+              - unique
+              - not_null
+      - name: production_productsubcategory
+        description: Product subcategories, each inside a category.
+      - name: production_productcategory
+        description: Top level product categories.
+      - name: person_person
+        description: People, such as customers, employees and contacts.
+      - name: sales_store
+        description: Stores that buy from the company.
+        columns:
+          - name: businessentityid
+            data_tests:
+              - unique
+              - not_null
+      - name: person_address
+        description: Street addresses of customers, employees and vendors.
+      - name: person_stateprovince
+        description: States and provinces, with the sales territory of each.
+      - name: person_countryregion
+        description: Countries and regions, by ISO code.
+      - name: sales_specialoffer
+        description: Discounts and promotions.
+        columns:
+          - name: specialofferid
+            data_tests:
+              - unique
+              - not_null
+          - name: discountpct
+            data_tests:
+              - not_null
+      - name: sales_salesreason
+        description: Reasons why customers buy.
+        columns:
+          - name: salesreasonid
+            data_tests:
+              - unique
+              - not_null
+          - name: reasontype
+            data_tests:
+              - accepted_values:
+                  arguments:
+                    values:
+                      - Other
+                      - Promotion
+                      - Marketing
+      - name: sales_salesorderheadersalesreason
+        description: Links sales orders to the reasons for the purchase.
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - salesorderid
+                  - salesreasonid
+      - name: production_productcosthistory
+        description: Standard cost of each product over time.
+      - name: sales_salespersonquotahistory
+        description: Sales quota of each sales person over time.
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - businessentityid
+                  - quotadate
+        columns:
+          - name: salesquota
+            data_tests:
+              - not_null
+      - name: sales_salesterritoryhistory
+        description: Sales territory assignments of each sales person over time.
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - businessentityid
+                  - territoryid
+                  - startdate
+      - name: sales_creditcard
+        description: Credit cards used for sales. Contains sensitive payment data.
+        columns:
+          - name: creditcardid
+            data_tests:
+              - unique
+              - not_null
+          - name: cardtype
+            data_tests:
+              - accepted_values:
+                  arguments:
+                    values:
+                      - Vista
+                      - SuperiorCard
+                      - Distinguish
+                      - ColonialVoice
+      - name: sales_currency
+        description: Currencies, by ISO code.
+        columns:
+          - name: currencycode
+            data_tests:
+              - unique
+              - not_null
+      - name: sales_currencyrate
+        description: Daily exchange rates between currencies.
+        columns:
+          - name: currencyrateid
+            data_tests:
+              - unique
+              - not_null
+          - name: averagerate
+            data_tests:
+              - not_null
+          - name: endofdayrate
+            data_tests:
+              - not_null
+      - name: sales_countryregioncurrency
+        description: Currency used by each country or region.
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - countryregioncode
+                  - currencycode
+      - name: production_scrapreason
+        description: Reasons why manufactured items are scrapped.
+      - name: production_workorder
+        description: Manufacturing work orders.
+      - name: sales_specialofferproduct
+        description: Links special offers to the products they apply to.
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - specialofferid
+                  - productid
