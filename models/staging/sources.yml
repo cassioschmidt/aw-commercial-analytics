@@ -144,6 +144,39 @@ sources:
               - not_null
       - name: person_person
         description: People, such as customers, employees and contacts.
+        columns:
+          - name: businessentityid
+            data_tests:
+              - unique
+              - not_null
+          - name: persontype
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values:
+                      - IN
+                      - SC
+                      - SP
+                      - EM
+                      - VC
+                      - GC
+          - name: firstname
+            data_tests:
+              - not_null
+          - name: lastname
+            data_tests:
+              - not_null
+          - name: emailpromotion
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values:
+                      - 0
+                      - 1
+                      - 2
+                    quote: false
       - name: sales_store
         description: Stores that buy from the company.
         columns:
