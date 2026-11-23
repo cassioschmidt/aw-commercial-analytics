@@ -223,6 +223,20 @@ sources:
                   - businessentityid
                   - territoryid
                   - startdate
+      - name: sales_salesterritory
+        description: Sales territories.
+        columns:
+          - name: territoryid
+            data_tests:
+              - unique
+              - not_null
+      - name: sales_salesperson
+        description: Sales people, with quota, bonus and commission.
+        columns:
+          - name: businessentityid
+            data_tests:
+              - unique
+              - not_null
       - name: sales_creditcard
         description: Credit cards used for sales. Contains sensitive payment data.
         columns:
