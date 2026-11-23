@@ -73,6 +73,7 @@ sources:
           - name: orderqty
             data_tests:
               - not_null
+              - non_negative
           - name: productid
             data_tests:
               - not_null
@@ -82,9 +83,11 @@ sources:
           - name: unitprice
             data_tests:
               - not_null
+              - non_negative
           - name: unitpricediscount
             data_tests:
               - not_null
+              - non_negative
         config:
           freshness:
             warn_after: {count: 35, period: day}
