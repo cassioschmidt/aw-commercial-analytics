@@ -192,6 +192,16 @@ sources:
                   - salesreasonid
       - name: production_productcosthistory
         description: Standard cost of each product over time.
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - productid
+                  - startdate
+        columns:
+          - name: standardcost
+            data_tests:
+              - not_null
       - name: sales_salespersonquotahistory
         description: Sales quota of each sales person over time.
         data_tests:
