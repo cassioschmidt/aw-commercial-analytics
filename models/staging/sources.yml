@@ -202,6 +202,20 @@ sources:
               - not_null
       - name: person_stateprovince
         description: States and provinces, with the sales territory of each.
+        columns:
+          - name: stateprovinceid
+            data_tests:
+              - unique
+              - not_null
+          - name: countryregioncode
+            data_tests:
+              - not_null
+          - name: name
+            data_tests:
+              - not_null
+          - name: territoryid
+            data_tests:
+              - not_null
       - name: person_countryregion
         description: Countries and regions, by ISO code.
       - name: sales_specialoffer
