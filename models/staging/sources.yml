@@ -42,15 +42,29 @@ sources:
           - name: subtotal
             data_tests:
               - not_null
+              - non_negative
           - name: taxamt
             data_tests:
               - not_null
+              - non_negative
           - name: freight
             data_tests:
               - not_null
+              - non_negative
           - name: totaldue
             data_tests:
               - not_null
+              - non_negative
+          - name: shipdate
+            data_tests:
+              - date_not_before:
+                  arguments:
+                    compare_column: orderdate
+          - name: duedate
+            data_tests:
+              - date_not_before:
+                  arguments:
+                    compare_column: orderdate
         config:
           freshness:
             warn_after: {count: 35, period: day}
@@ -69,6 +83,7 @@ sources:
           - name: orderqty
             data_tests:
               - not_null
+              - non_negative
           - name: productid
             data_tests:
               - not_null
@@ -78,9 +93,11 @@ sources:
           - name: unitprice
             data_tests:
               - not_null
+              - non_negative
           - name: unitpricediscount
             data_tests:
               - not_null
+              - non_negative
         config:
           freshness:
             warn_after: {count: 35, period: day}
@@ -321,6 +338,11 @@ sources:
           - name: standardcost
             data_tests:
               - not_null
+          - name: enddate
+            data_tests:
+              - date_not_before:
+                  arguments:
+                    compare_column: startdate
       - name: production_scrapreason
         description: 'Reasons why manufactured items are scrapped. Expected arrival: yearly (reference data that rarely changes).'
         columns:
@@ -351,6 +373,11 @@ sources:
           - name: startdate
             data_tests:
               - not_null
+          - name: enddate
+            data_tests:
+              - date_not_before:
+                  arguments:
+                    compare_column: startdate
         config:
           freshness:
             warn_after: {count: 35, period: day}
