@@ -269,6 +269,14 @@ sources:
                   - currencycode
       - name: production_scrapreason
         description: Reasons why manufactured items are scrapped.
+        columns:
+          - name: scrapreasonid
+            data_tests:
+              - unique
+              - not_null
+          - name: name
+            data_tests:
+              - not_null
       - name: production_workorder
         description: Manufacturing work orders.
       - name: sales_specialofferproduct
