@@ -368,6 +368,11 @@ sources:
           - name: startdate
             data_tests:
               - not_null
+          - name: enddate
+            data_tests:
+              - date_not_before:
+                  arguments:
+                    compare_column: startdate
         config:
           freshness:
             warn_after: {count: 35, period: day}
