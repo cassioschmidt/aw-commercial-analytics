@@ -1,20 +1,17 @@
 version: 2
-
 sources:
   - name: adventure_works
-    description: >
-      AdventureWorks tables loaded as CSV files from Google Drive by Fivetran
-      (Magic Folder, one table per file). Kept exactly as loaded.
+    description: AdventureWorks tables loaded as CSV files from Google Drive by Fivetran (Magic Folder, one table per file). Kept exactly as loaded.
     database: raw
     schema: adventure_works
     config:
       loaded_at_field: _fivetran_synced
       freshness:
-        warn_after: {count: 30, period: day}
-        error_after: {count: 90, period: day}
+        warn_after: {count: 95, period: day}
+        error_after: {count: 120, period: day}
     tables:
       - name: sales_salesorderheader
-        description: Sales orders, one row per order.
+        description: 'Sales orders, one row per order. Expected arrival: monthly, with the sales extract (transactional data).'
         columns:
           - name: salesorderid
             data_tests:
@@ -54,8 +51,13 @@ sources:
           - name: totaldue
             data_tests:
               - not_null
+        config:
+          freshness:
+            warn_after: {count: 35, period: day}
+            error_after: {count: 45, period: day}
+            filter: _fivetran_synced >= dateadd('day', -45, current_timestamp())
       - name: sales_salesorderdetail
-        description: Order lines, one row per product in each sales order.
+        description: 'Order lines, one row per product in each sales order. Expected arrival: monthly, with the sales extract (transactional data).'
         columns:
           - name: salesorderdetailid
             data_tests:
@@ -79,15 +81,179 @@ sources:
           - name: unitpricediscount
             data_tests:
               - not_null
+        config:
+          freshness:
+            warn_after: {count: 35, period: day}
+            error_after: {count: 45, period: day}
+            filter: _fivetran_synced >= dateadd('day', -45, current_timestamp())
       - name: sales_customer
-        description: Customers, either a person or a store.
+        description: 'Customers, either a person or a store. Expected arrival: quarterly (master data that changes slowly).'
         columns:
           - name: customerid
             data_tests:
               - unique
               - not_null
+        config:
+          freshness:
+            warn_after: {count: 95, period: day}
+            error_after: {count: 120, period: day}
+            filter: _fivetran_synced >= dateadd('day', -120, current_timestamp())
+      - name: sales_salesperson
+        description: 'Sales people, with quota, bonus and commission. Expected arrival: quarterly (master data that changes slowly).'
+        columns:
+          - name: businessentityid
+            data_tests:
+              - unique
+              - not_null
+      - name: sales_store
+        description: 'Stores that buy from the company. Expected arrival: quarterly (master data that changes slowly).'
+        columns:
+          - name: businessentityid
+            data_tests:
+              - unique
+              - not_null
+      - name: sales_specialoffer
+        description: 'Discounts and promotions. Expected arrival: quarterly (master data that changes slowly).'
+        columns:
+          - name: specialofferid
+            data_tests:
+              - unique
+              - not_null
+          - name: discountpct
+            data_tests:
+              - not_null
+      - name: sales_salesreason
+        description: 'Reasons why customers buy. Expected arrival: yearly (reference data that rarely changes).'
+        columns:
+          - name: salesreasonid
+            data_tests:
+              - unique
+              - not_null
+          - name: reasontype
+            data_tests:
+              - accepted_values:
+                  arguments:
+                    values:
+                      - Other
+                      - Promotion
+                      - Marketing
+        config:
+          freshness:
+            warn_after: {count: 380, period: day}
+            error_after: {count: 400, period: day}
+      - name: sales_salesorderheadersalesreason
+        description: 'Links sales orders to the reasons for the purchase. Expected arrival: monthly, with the sales extract (transactional data).'
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - salesorderid
+                  - salesreasonid
+        config:
+          freshness:
+            warn_after: {count: 35, period: day}
+            error_after: {count: 45, period: day}
+            filter: _fivetran_synced >= dateadd('day', -45, current_timestamp())
+      - name: sales_salespersonquotahistory
+        description: 'Sales quota of each sales person over time. Expected arrival: quarterly (master data that changes slowly).'
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - businessentityid
+                  - quotadate
+        columns:
+          - name: salesquota
+            data_tests:
+              - not_null
+      - name: sales_salesterritoryhistory
+        description: 'Sales territory assignments of each sales person over time. Expected arrival: quarterly (master data that changes slowly).'
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - businessentityid
+                  - territoryid
+                  - startdate
+      - name: sales_salesterritory
+        description: 'Sales territories. Expected arrival: yearly (reference data that rarely changes).'
+        columns:
+          - name: territoryid
+            data_tests:
+              - unique
+              - not_null
+        config:
+          freshness:
+            warn_after: {count: 380, period: day}
+            error_after: {count: 400, period: day}
+      - name: sales_creditcard
+        description: 'Credit cards used for sales. Contains sensitive payment data. Expected arrival: quarterly (master data that changes slowly).'
+        columns:
+          - name: creditcardid
+            data_tests:
+              - unique
+              - not_null
+          - name: cardtype
+            data_tests:
+              - accepted_values:
+                  arguments:
+                    values:
+                      - Vista
+                      - SuperiorCard
+                      - Distinguish
+                      - ColonialVoice
+        config:
+          freshness:
+            warn_after: {count: 95, period: day}
+            error_after: {count: 120, period: day}
+            filter: _fivetran_synced >= dateadd('day', -120, current_timestamp())
+      - name: sales_currency
+        description: 'Currencies, by ISO code. Expected arrival: yearly (reference data that rarely changes).'
+        columns:
+          - name: currencycode
+            data_tests:
+              - unique
+              - not_null
+        config:
+          freshness:
+            warn_after: {count: 380, period: day}
+            error_after: {count: 400, period: day}
+      - name: sales_currencyrate
+        description: 'Daily exchange rates between currencies. Expected arrival: monthly, with the sales extract (transactional data).'
+        columns:
+          - name: currencyrateid
+            data_tests:
+              - unique
+              - not_null
+          - name: averagerate
+            data_tests:
+              - not_null
+          - name: endofdayrate
+            data_tests:
+              - not_null
+        config:
+          freshness:
+            warn_after: {count: 35, period: day}
+            error_after: {count: 45, period: day}
+            filter: _fivetran_synced >= dateadd('day', -45, current_timestamp())
+      - name: sales_countryregioncurrency
+        description: 'Currency used by each country or region. Expected arrival: quarterly (master data that changes slowly).'
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - countryregioncode
+                  - currencycode
+      - name: sales_specialofferproduct
+        description: 'Links special offers to the products they apply to. Expected arrival: quarterly (master data that changes slowly).'
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - specialofferid
+                  - productid
       - name: production_product
-        description: Products sold or used in manufacturing.
+        description: 'Products sold or used in manufacturing. Expected arrival: quarterly (master data that changes slowly).'
         columns:
           - name: productid
             data_tests:
@@ -112,15 +278,8 @@ sources:
           - name: listprice
             data_tests:
               - not_null
-      - name: sales_salesperson
-        description: Sales people, with quota, bonus and commission.
-        columns:
-          - name: businessentityid
-            data_tests:
-              - unique
-              - not_null
       - name: production_productsubcategory
-        description: Product subcategories, each inside a category.
+        description: 'Product subcategories, each inside a category. Expected arrival: yearly (reference data that rarely changes).'
         columns:
           - name: productsubcategoryid
             data_tests:
@@ -132,8 +291,12 @@ sources:
           - name: name
             data_tests:
               - not_null
+        config:
+          freshness:
+            warn_after: {count: 380, period: day}
+            error_after: {count: 400, period: day}
       - name: production_productcategory
-        description: Top level product categories.
+        description: 'Top level product categories. Expected arrival: yearly (reference data that rarely changes).'
         columns:
           - name: productcategoryid
             data_tests:
@@ -142,8 +305,59 @@ sources:
           - name: name
             data_tests:
               - not_null
+        config:
+          freshness:
+            warn_after: {count: 380, period: day}
+            error_after: {count: 400, period: day}
+      - name: production_productcosthistory
+        description: 'Standard cost of each product over time. Expected arrival: quarterly (master data that changes slowly).'
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - productid
+                  - startdate
+        columns:
+          - name: standardcost
+            data_tests:
+              - not_null
+      - name: production_scrapreason
+        description: 'Reasons why manufactured items are scrapped. Expected arrival: yearly (reference data that rarely changes).'
+        columns:
+          - name: scrapreasonid
+            data_tests:
+              - unique
+              - not_null
+          - name: name
+            data_tests:
+              - not_null
+        config:
+          freshness:
+            warn_after: {count: 380, period: day}
+            error_after: {count: 400, period: day}
+      - name: production_workorder
+        description: 'Manufacturing work orders. Expected arrival: monthly, with the sales extract (transactional data).'
+        columns:
+          - name: workorderid
+            data_tests:
+              - unique
+              - not_null
+          - name: productid
+            data_tests:
+              - not_null
+          - name: orderqty
+            data_tests:
+              - not_null
+          - name: startdate
+            data_tests:
+              - not_null
+        config:
+          freshness:
+            warn_after: {count: 35, period: day}
+            error_after: {count: 45, period: day}
+            filter: _fivetran_synced >= dateadd('day', -45, current_timestamp())
       - name: person_person
-        description: People, such as customers, employees and contacts.
+        description: 'People, such as customers, employees and contacts. Expected arrival: quarterly (master data that changes slowly).'
         columns:
           - name: businessentityid
             data_tests:
@@ -177,15 +391,13 @@ sources:
                       - 1
                       - 2
                     quote: false
-      - name: sales_store
-        description: Stores that buy from the company.
-        columns:
-          - name: businessentityid
-            data_tests:
-              - unique
-              - not_null
+        config:
+          freshness:
+            warn_after: {count: 95, period: day}
+            error_after: {count: 120, period: day}
+            filter: _fivetran_synced >= dateadd('day', -120, current_timestamp())
       - name: person_address
-        description: Street addresses of customers, employees and vendors.
+        description: 'Street addresses of customers, employees and vendors. Expected arrival: quarterly (master data that changes slowly).'
         columns:
           - name: addressid
             data_tests:
@@ -200,8 +412,13 @@ sources:
           - name: postalcode
             data_tests:
               - not_null
+        config:
+          freshness:
+            warn_after: {count: 95, period: day}
+            error_after: {count: 120, period: day}
+            filter: _fivetran_synced >= dateadd('day', -120, current_timestamp())
       - name: person_stateprovince
-        description: States and provinces, with the sales territory of each.
+        description: 'States and provinces, with the sales territory of each. Expected arrival: yearly (reference data that rarely changes).'
         columns:
           - name: stateprovinceid
             data_tests:
@@ -216,8 +433,12 @@ sources:
           - name: territoryid
             data_tests:
               - not_null
+        config:
+          freshness:
+            warn_after: {count: 380, period: day}
+            error_after: {count: 400, period: day}
       - name: person_countryregion
-        description: Countries and regions, by ISO code.
+        description: 'Countries and regions, by ISO code. Expected arrival: yearly (reference data that rarely changes).'
         columns:
           - name: countryregioncode
             data_tests:
@@ -226,154 +447,7 @@ sources:
           - name: name
             data_tests:
               - not_null
-      - name: sales_specialoffer
-        description: Discounts and promotions.
-        columns:
-          - name: specialofferid
-            data_tests:
-              - unique
-              - not_null
-          - name: discountpct
-            data_tests:
-              - not_null
-      - name: sales_salesreason
-        description: Reasons why customers buy.
-        columns:
-          - name: salesreasonid
-            data_tests:
-              - unique
-              - not_null
-          - name: reasontype
-            data_tests:
-              - accepted_values:
-                  arguments:
-                    values:
-                      - Other
-                      - Promotion
-                      - Marketing
-      - name: sales_salesorderheadersalesreason
-        description: Links sales orders to the reasons for the purchase.
-        data_tests:
-          - dbt_utils.unique_combination_of_columns:
-              arguments:
-                combination_of_columns:
-                  - salesorderid
-                  - salesreasonid
-      - name: production_productcosthistory
-        description: Standard cost of each product over time.
-        data_tests:
-          - dbt_utils.unique_combination_of_columns:
-              arguments:
-                combination_of_columns:
-                  - productid
-                  - startdate
-        columns:
-          - name: standardcost
-            data_tests:
-              - not_null
-      - name: sales_salespersonquotahistory
-        description: Sales quota of each sales person over time.
-        data_tests:
-          - dbt_utils.unique_combination_of_columns:
-              arguments:
-                combination_of_columns:
-                  - businessentityid
-                  - quotadate
-        columns:
-          - name: salesquota
-            data_tests:
-              - not_null
-      - name: sales_salesterritoryhistory
-        description: Sales territory assignments of each sales person over time.
-        data_tests:
-          - dbt_utils.unique_combination_of_columns:
-              arguments:
-                combination_of_columns:
-                  - businessentityid
-                  - territoryid
-                  - startdate
-      - name: sales_salesterritory
-        description: Sales territories.
-        columns:
-          - name: territoryid
-            data_tests:
-              - unique
-              - not_null
-      - name: sales_creditcard
-        description: Credit cards used for sales. Contains sensitive payment data.
-        columns:
-          - name: creditcardid
-            data_tests:
-              - unique
-              - not_null
-          - name: cardtype
-            data_tests:
-              - accepted_values:
-                  arguments:
-                    values:
-                      - Vista
-                      - SuperiorCard
-                      - Distinguish
-                      - ColonialVoice
-      - name: sales_currency
-        description: Currencies, by ISO code.
-        columns:
-          - name: currencycode
-            data_tests:
-              - unique
-              - not_null
-      - name: sales_currencyrate
-        description: Daily exchange rates between currencies.
-        columns:
-          - name: currencyrateid
-            data_tests:
-              - unique
-              - not_null
-          - name: averagerate
-            data_tests:
-              - not_null
-          - name: endofdayrate
-            data_tests:
-              - not_null
-      - name: sales_countryregioncurrency
-        description: Currency used by each country or region.
-        data_tests:
-          - dbt_utils.unique_combination_of_columns:
-              arguments:
-                combination_of_columns:
-                  - countryregioncode
-                  - currencycode
-      - name: production_scrapreason
-        description: Reasons why manufactured items are scrapped.
-        columns:
-          - name: scrapreasonid
-            data_tests:
-              - unique
-              - not_null
-          - name: name
-            data_tests:
-              - not_null
-      - name: production_workorder
-        description: Manufacturing work orders.
-        columns:
-          - name: workorderid
-            data_tests:
-              - unique
-              - not_null
-          - name: productid
-            data_tests:
-              - not_null
-          - name: orderqty
-            data_tests:
-              - not_null
-          - name: startdate
-            data_tests:
-              - not_null
-      - name: sales_specialofferproduct
-        description: Links special offers to the products they apply to.
-        data_tests:
-          - dbt_utils.unique_combination_of_columns:
-              arguments:
-                combination_of_columns:
-                  - specialofferid
-                  - productid
+        config:
+          freshness:
+            warn_after: {count: 380, period: day}
+            error_after: {count: 400, period: day}
