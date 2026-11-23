@@ -186,6 +186,20 @@ sources:
               - not_null
       - name: person_address
         description: Street addresses of customers, employees and vendors.
+        columns:
+          - name: addressid
+            data_tests:
+              - unique
+              - not_null
+          - name: city
+            data_tests:
+              - not_null
+          - name: stateprovinceid
+            data_tests:
+              - not_null
+          - name: postalcode
+            data_tests:
+              - not_null
       - name: person_stateprovince
         description: States and provinces, with the sales territory of each.
       - name: person_countryregion
