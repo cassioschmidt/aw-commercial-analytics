@@ -42,15 +42,19 @@ sources:
           - name: subtotal
             data_tests:
               - not_null
+              - non_negative
           - name: taxamt
             data_tests:
               - not_null
+              - non_negative
           - name: freight
             data_tests:
               - not_null
+              - non_negative
           - name: totaldue
             data_tests:
               - not_null
+              - non_negative
         config:
           freshness:
             warn_after: {count: 35, period: day}
