@@ -45,3 +45,23 @@ sources:
       description: Reasons why customers buy.
     - name: sales_salesorderheadersalesreason
       description: Links sales orders to the reasons for the purchase.
+    - name: production_productcosthistory
+      description: Standard cost of each product over time.
+    - name: sales_salespersonquotahistory
+      description: Sales quota of each sales person over time.
+    - name: sales_salesterritoryhistory
+      description: Sales territory assignments of each sales person over time.
+    - name: sales_creditcard
+      description: Credit cards used for sales. Contains sensitive payment data.
+    - name: sales_currency
+      description: Currencies, by ISO code.
+    - name: sales_currencyrate
+      description: Daily exchange rates between currencies.
+    - name: sales_countryregioncurrency
+      description: Currency used by each country or region.
+    - name: production_scrapreason
+      description: Reasons why manufactured items are scrapped.
+    - name: production_workorder
+      description: Manufacturing work orders.
+    - name: sales_specialofferproduct
+      description: Links special offers to the products they apply to.
