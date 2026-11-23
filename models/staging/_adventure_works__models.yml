@@ -231,3 +231,233 @@ models:
               arguments:
                 to: ref('stg_adventure_works__sales_salesreason')
                 field: sales_reason_id
+
+  - name: stg_adventure_works__production_productcosthistory
+    description: Standard cost of each product over time.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - product_id
+              - start_date
+    columns:
+      - name: product_id
+        description: Product that the cost applies to.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__production_product')
+                field: product_id
+      - name: standard_cost
+        description: Standard cost of one unit in the period.
+        data_tests:
+          - not_null
+
+  - name: stg_adventure_works__sales_salespersonquotahistory
+    description: Sales quota of each sales person over time.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - sales_person_id
+              - quota_date
+    columns:
+      - name: sales_person_id
+        description: Sales person that the quota belongs to.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_salesperson')
+                field: sales_person_id
+
+  - name: stg_adventure_works__sales_salesterritoryhistory
+    description: Sales territory assignments of each sales person over time.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - sales_person_id
+              - territory_id
+              - start_date
+    columns:
+      - name: sales_person_id
+        description: Sales person assigned to the territory.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_salesperson')
+                field: sales_person_id
+      - name: territory_id
+        description: Territory covered in the period.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_salesterritory')
+                field: territory_id
+
+  - name: stg_adventure_works__sales_creditcard
+    description: Credit cards used for sales. Contains sensitive payment data.
+    columns:
+      - name: credit_card_id
+        description: Primary key of the credit card.
+        data_tests:
+          - unique
+          - not_null
+      - name: card_type
+        description: Brand of the credit card.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - Vista
+                  - SuperiorCard
+                  - Distinguish
+                  - ColonialVoice
+      - name: card_number
+        description: Credit card number. Sensitive payment data, never exposed in marts.
+        config:
+          meta:
+            sensitivity: payment
+
+  - name: stg_adventure_works__sales_currency
+    description: Currencies, by ISO code.
+    columns:
+      - name: currency_code
+        description: Primary key of the currency, the ISO code.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_adventure_works__sales_currencyrate
+    description: Daily exchange rates between currencies.
+    columns:
+      - name: currency_rate_id
+        description: Primary key of the exchange rate.
+        data_tests:
+          - unique
+          - not_null
+      - name: from_currency_code
+        description: Currency being converted from.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_currency')
+                field: currency_code
+      - name: to_currency_code
+        description: Currency being converted to.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_currency')
+                field: currency_code
+
+  - name: stg_adventure_works__sales_countryregioncurrency
+    description: Currency used by each country or region.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - country_region_code
+              - currency_code
+    columns:
+      - name: country_region_code
+        description: Country or region.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__person_countryregion')
+                field: country_region_code
+      - name: currency_code
+        description: Currency used in the country or region.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_currency')
+                field: currency_code
+
+  - name: stg_adventure_works__production_scrapreason
+    description: Reasons why manufactured items are scrapped.
+    columns:
+      - name: scrap_reason_id
+        description: Primary key of the scrap reason.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_adventure_works__production_workorder
+    description: Manufacturing work orders.
+    columns:
+      - name: work_order_id
+        description: Primary key of the work order.
+        data_tests:
+          - unique
+          - not_null
+      - name: product_id
+        description: Product being manufactured.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__production_product')
+                field: product_id
+      - name: scrap_reason_id
+        description: Reason for scrap. Empty when nothing was scrapped.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__production_scrapreason')
+                field: scrap_reason_id
+
+  - name: stg_adventure_works__sales_specialofferproduct
+    description: Links special offers to the products they apply to.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - special_offer_id
+              - product_id
+    columns:
+      - name: special_offer_id
+        description: Special offer of the link.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__sales_specialoffer')
+                field: special_offer_id
+      - name: product_id
+        description: Product of the link.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__production_product')
+                field: product_id
+
+  - name: stg_adventure_works__production_productcategory
+    description: Top level product categories.
+    columns:
+      - name: product_category_id
+        description: Primary key of the product category.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_adventure_works__production_productsubcategory
+    description: Product subcategories, each inside a category.
+    columns:
+      - name: product_subcategory_id
+        description: Primary key of the product subcategory.
+        data_tests:
+          - unique
+          - not_null
+      - name: product_category_id
+        description: Category that the subcategory belongs to.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_adventure_works__production_productcategory')
+                field: product_category_id
