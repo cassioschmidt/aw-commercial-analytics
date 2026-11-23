@@ -1,0 +1,31 @@
+version: 2
+
+macros:
+  - name: test_non_negative
+    description: >
+      Fails for every row where the column is below zero. Use it for amounts,
+      prices, quantities and any measure that cannot be negative. Null values
+      are not flagged, use not_null for that.
+    arguments:
+      - name: model
+        type: string
+        description: Table or model being tested. Filled in by dbt.
+      - name: column_name
+        type: string
+        description: Numeric column that must be zero or greater. Filled in by dbt.
+
+  - name: test_date_not_before
+    description: >
+      Fails for every row where the column date comes before the date in
+      compare_column. Use it for valid event sequences, such as ship date after
+      order date. Rows with a null in either column are not flagged.
+    arguments:
+      - name: model
+        type: string
+        description: Table or model being tested. Filled in by dbt.
+      - name: column_name
+        type: string
+        description: Date column that must not be earlier than compare_column. Filled in by dbt.
+      - name: compare_column
+        type: string
+        description: Date column of the same row used as the lower limit. Set in the test call under arguments.
