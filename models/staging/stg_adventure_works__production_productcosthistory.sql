@@ -1,6 +1,6 @@
 with 
 source as (
-    select * from {{ source('adventure_works', 'production_productcosthistory') }}
+    select * from {{ source("adventure_works", "production_productcosthistory") }}
 ),
 renamed as (
     select
