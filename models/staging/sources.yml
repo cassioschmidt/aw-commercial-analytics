@@ -121,6 +121,17 @@ sources:
               - not_null
       - name: production_productsubcategory
         description: Product subcategories, each inside a category.
+        columns:
+          - name: productsubcategoryid
+            data_tests:
+              - unique
+              - not_null
+          - name: productcategoryid
+            data_tests:
+              - not_null
+          - name: name
+            data_tests:
+              - not_null
       - name: production_productcategory
         description: Top level product categories.
       - name: person_person
