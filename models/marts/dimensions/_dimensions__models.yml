@@ -1,0 +1,66 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: >
+      Conformed date dimension. One row per calendar day from 2010-07-01 to
+      2016-06-30, plus an unknown member (date_key = -1). The sales facts use it in
+      three roles: order date, due date and ship date. The fiscal year runs from
+      1 July to 30 June and is named by the year in which it ends (July 2013 is
+      FY2014).
+    config:
+      meta:
+        owner: cassio.schmidt
+        domain: commercial
+        sensitivity: none
+    columns:
+      - name: date_key
+        description: >
+          Surrogate key in the format yyyymmdd (integer). -1 is the unknown member.
+        data_tests:
+          - unique
+          - not_null
+      - name: full_date
+        description: Calendar date. Null only for the unknown member.
+        data_tests:
+          - unique
+      - name: calendar_year
+        description: Calendar year (January to December). Null for the unknown member.
+      - name: calendar_quarter
+        description: Calendar quarter, 1 to 4. Null for the unknown member.
+      - name: month_number
+        description: Calendar month, 1 to 12. Null for the unknown member.
+      - name: month_name
+        description: Abbreviated month name (Jan, Feb, ...). Unknown for the unknown member.
+      - name: day_of_week_number
+        description: ISO day of week, 1 (Monday) to 7 (Sunday). Null for the unknown member.
+      - name: day_name
+        description: Abbreviated day name (Mon, Tue, ...). Unknown for the unknown member.
+      - name: is_weekend
+        description: True for Saturday and Sunday.
+      - name: fiscal_year
+        description: >
+          Fiscal year named by the year in which it ends. Calculated by the
+          fiscal_year macro from full_date and the fiscal_year_start_month variable.
+      - name: fiscal_quarter
+        description: >
+          Fiscal quarter, 1 to 4. Q1 is July to September. Calculated by the
+          fiscal_quarter macro.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4]
+                quote: false
+      - name: fiscal_month_number
+        description: >
+          Month within the fiscal year, 1 (July) to 12 (June). Calculated by the
+          fiscal_month macro.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+                quote: false
+      - name: fiscal_year_label
+        description: Fiscal year as text, for example FY2014.
+      - name: fiscal_quarter_label
+        description: Fiscal year and quarter as text, for example FY2014 Q1.
